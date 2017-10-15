@@ -1,0 +1,59 @@
+.icon{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.animated-icon{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: 0px 0px 4px white;
+  transition: all 1s ;
+  position: absolute;
+}
+
+.leaflet-popup-pane {
+  left: -10px;
+  z-index: 7;
+}
+
+.white03{
+  background-color: rgba(255,255,255,0.3);
+}
+
+.green03{
+  background-color: rgba(0,207,29,0.3);
+}
+
+.yellow03{
+  background-color: rgba(192,214,10,0.3);
+}
+
+.orange03{
+  background-color: rgba(214,164,10,0.3);
+}
+
+.red03{
+  background-color: rgba(238,53,46,0.3);
+}
+
+.white08{
+  background-color: rgba(255,255,255,0.8);
+}
+
+.green08{
+  background-color: rgba(0,207,29,0.8);
+}
+
+.yellow08{
+  background-color: rgba(192,214,10,0.8);
+}
+
+.orange08{
+  background-color: rgba(214,164,10,0.8);
+}
+
+.red08{
+  background-color: rgba(238,53,46,0.8);
+}

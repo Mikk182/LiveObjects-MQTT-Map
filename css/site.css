@@ -1,0 +1,25 @@
+body {
+    padding-top: 12em;
+    padding-bottom: 20px;
+}
+
+.navbar-inverse {
+    background-image: linear-gradient(to bottom, #3194ce 0px, #bddeef 100%);
+    background-repeat: repeat-x;
+}
+
+/* Logo principal de l'application */
+.logo {
+    background-image: url("../img/logo2.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    /*TODO : intégrer correctement le logo une fois celui-ci définitif*/
+    width: 10em;
+    height: 9em;
+    margin: 3px;
+    text-indent: -9999px; /* hides the link text */
+}
+
+.navbar-nav{
+    height: 9em;
+}
