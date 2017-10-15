@@ -361,4 +361,6 @@ $( document ).ready(function() {
 
     icon.animate();
 	
+	subscribe();
+	
 });
