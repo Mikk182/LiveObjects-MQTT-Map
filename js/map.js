@@ -135,21 +135,20 @@ function GetLastLocation() {
 	xhttp.setRequestHeader("X-API-Key", "7b0d4da5ca514b7e92c7fe2f04f9e581");
     xhttp.send();
     var response = JSON.parse(xhttp.responseText);
-	// alert(response[0].value.payload);
-	var hex = response[0].value.payload;
-	// alert(hex);
-	hex = hex.substring(0, hex.length - 1);
-	// alert(hex);
-	var location = hexToAscii(hex);
-	//alert(location);
 	
+	// Location
+	var hex = response[0].value.payload;
+	hex = hex.substring(0, hex.length - 1);
+	var location = hexToAscii(hex);
 	var locations = location.split(',');
 	var lat = locations[0];
 	var long = locations[1];
-	// alert(lat);
-	// alert(long);
+	// UTC TimeStamp
+	var utcTimestamp = response[0].timestamp;
+	//devEui
+	var devEUI = response[0].metadata.network.lora.devEUI;
 	
-	return { lat, long };
+	return { devEUI, utcTimestamp, lat, long };
 }
 
 function hexToAscii(str){
@@ -240,13 +239,21 @@ $( document ).ready(function() {
       // });
 
     // var defaultLayer = 'mapbox.streets-satellite';
+	
 	var map = L.map('map').setView([49.488332, 0.122278], 13);
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
 		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
 		maxZoom: 18,
-		id: 'mapbox.satellite',
+		id: 'mapbox.dark',
 		accessToken: 'pk.eyJ1IjoibWlrayIsImEiOiJjaXVweDc5MXEwMDNzMnlwazk2c2wxMHM0In0.QyydO2WoRTjolCwYV3ZogA'
 	}).addTo(map);
+	
+	// var map = L.map('map').setView([49.488332, 0.122278], 13);
+ 	
+	// L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+		// attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+	// }).addTo(map);
+	
     // var map = eon.map({
         // pubnub: pn,
         // id: 'map',
@@ -318,22 +325,27 @@ $( document ).ready(function() {
         $(this).children('.content').toggle('slow');
     });
 
-    L.control.layers({
-        "streets": L.tileLayer("mapbox.streets"),
-        "light": L.tileLayer("mapbox.light"),
-        "dark": L.tileLayer("mapbox.dark"),
-        "satellite": L.tileLayer("mapbox.satellite"),
-        "streets-satellite": L.tileLayer("mapbox.streets-satellite"),
-        "wheatpaste": L.tileLayer("mapbox.wheatpaste"),
-        "streets-basic": L.tileLayer("mapbox.streets-basic"),
-        "comic": L.tileLayer("mapbox.comic"),
-        "outdoors": L.tileLayer("mapbox.outdoors"),
-        "run-bike-hike": L.tileLayer("mapbox.run-bike-hike"),
-        "pencil": L.tileLayer("mapbox.pencil"),
-        "pirates": L.tileLayer("mapbox.pirates"),
-        "emerald": L.tileLayer("mapbox.emerald"),
-        "high-contrast": L.tileLayer("mapbox.high-contrast")
-    }, null).addTo(map);
+    // L.control.layers({
+        // "streets": L.tileLayer("mapbox.streets"),
+        // "light": L.tileLayer("mapbox.light"),
+        // "dark": L.tileLayer("mapbox.dark"),
+        // "satellite": L.tileLayer("mapbox.satellite"),
+        // "streets-satellite": L.tileLayer("mapbox.streets-satellite"),
+        // "wheatpaste": L.tileLayer("mapbox.wheatpaste"),
+        // "streets-basic": L.tileLayer("mapbox.streets-basic"),
+        // "comic": L.tileLayer("mapbox.comic"),
+        // "outdoors": L.tileLayer("mapbox.outdoors"),
+        // "run-bike-hike": L.tileLayer("mapbox.run-bike-hike"),
+        // "pencil": L.tileLayer("mapbox.pencil"),
+        // "pirates": L.tileLayer("mapbox.pirates"),
+        // "emerald": L.tileLayer("mapbox.emerald"),
+        // "high-contrast": L.tileLayer("mapbox.high-contrast")
+    // }, null).addTo(map);
+	
+	L.control.layers({
+		'Mapbox Streets': L.tileLayer('mapbox.streets'),
+		// 'Mapbox Light': L.mapbox.tileLayer('mapbox.light')
+	}).addTo(map);
 
 
     var icon = createIcon(1)
@@ -347,20 +359,23 @@ $( document ).ready(function() {
             icon: icon,
             opacity: 0.7,
         }
-    );
+    ).addTo(map);
 
-    var popUpText = "<div class='popup'><div class='item'>GESU00589</div><div class='item'>T° : 34 C°</div><div class='item'>Hum : 68 %</div></div>"
+    var popUpText = "<div class='popup'><div class='item'>"+location.devEUI+"</div><div class='item'>"+location.utcTimestamp+"</div><div class='item'>Lat : "+location.lat+"</div><div class='item'>Long : "+location.long+"</div></div>"
 
-    marker.bindPopup(popUpText);
+    marker.bindPopup(popUpText).openPopup();
 
     marker.options.icon.setColor(20);
 
     markerList.push(marker);
 
-    map.addLayer(marker);
-
     icon.animate();
 	
 	subscribe();
+		
 	
+
+	// L.marker([location.lat, location.long]).addTo(map)
+	        // .bindPopup('<strong>Science Hall</strong><br>Where the GISC was born.')
+	        // .openPopup();
 });
