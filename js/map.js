@@ -206,13 +206,13 @@ function subscribe(){
 
 			var hex = loraMessage.value.payload;
 			// alert(hex);
-			hex = hex.substring(0, hex.length - 1);
+			//hex = hex.substring(0, hex.length - 1);
 			// alert(hex);
 			var location = hexToAscii(hex);
 			
 			var locations = location.split(',');
 			var lat = locations[0];
-			var long = locations[1];
+			var lng = locations[1];
 			
 			var newLatLng = new L.LatLng(lat, lng);
 			markerList[0].setLatLng(newLatLng); 
