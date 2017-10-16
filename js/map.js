@@ -212,7 +212,7 @@ function subscribe(){
 			
 			var locations = location.split(',');
 			var lat = locations[0];
-			var lng = locations[1];
+			var lng = locations[1].slice(0, -1);
 			
 			var newLatLng = new L.LatLng(lat, lng);
 			markerList[0].setLatLng(newLatLng); 
