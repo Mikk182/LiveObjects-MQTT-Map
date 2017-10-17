@@ -142,13 +142,13 @@ function GetLastLocation() {
 	var location = hexToAscii(hex);
 	var locations = location.split(',');
 	var lat = locations[0];
-	var long = locations[1];
+	var lng = locations[1].slice(0,-1);
 	// UTC TimeStamp
 	var utcTimestamp = response[0].timestamp;
 	//devEui
 	var devEUI = response[0].metadata.network.lora.devEUI;
 	
-	return { devEUI, utcTimestamp, lat, long };
+	return { devEUI, utcTimestamp, lat, lng };
 }
 
 function hexToAscii(str){
@@ -194,19 +194,20 @@ function subscribe(){
 
 		client.on("message", function (topic, message) {
 
-		  console.log("MQTT::New message\n");
-		  var loraMessage = JSON.parse(message)
+			console.log("MQTT::New message\n");
+			var loraMessage = JSON.parse(message)
 
-		  console.log("DevEUI:", loraMessage.metadata.source.split(':')[2]);
-		  console.log("Timestamp:", loraMessage.timestamp);
-		  console.log("Port:", loraMessage.metadata.network.lora.port);
-		  console.log("Fcnt:", loraMessage.metadata.network.lora.fcnt);
-		  console.log("Payload:", loraMessage.value.payload, "\n");
+		  
+			var devEUI = loraMessage.metadata.source.split(':')[2];
+			var utcTimestamp = loraMessage.timestamp;
+			
+			console.log("DevEUI:", devEUI);
+			console.log("Timestamp:", utcTimestamp);
+			console.log("Port:", loraMessage.metadata.network.lora.port);
+			console.log("Fcnt:", loraMessage.metadata.network.lora.fcnt);
+			console.log("Payload:", loraMessage.value.payload, "\n");
 
 			var hex = loraMessage.value.payload;
-			// alert(hex);
-			//hex = hex.substring(0, hex.length - 1);
-			// alert(hex);
 			var location = hexToAscii(hex);
 			
 			var locations = location.split(',');
@@ -215,107 +216,19 @@ function subscribe(){
 			
 			var newLatLng = new L.LatLng(lat, lng);
 			markerList[0].setLatLng(newLatLng); 
+			
+			var popUpText = "<div class='popup'><div class='item'>"+devEUI+"</div><div class='item'>"+utcTimestamp+"</div><div class='item'>Lat : "+lat+"</div><div class='item'>Long : "+lng+"</div></div>"
+
+			markerList[0].bindPopup(popUpText);
 		})
 }
 
 var markerList= [];
 $( document ).ready(function() {
-    // var channels = ['SensorsMikk',
-        // "Sensor_1Mikk",
-        // "Sensor_2Mikk",
-        // "Sensor_3Mikk",
-        // "Sensor_4Mikk",
-        // "Sensor_5Mikk"
-        // ];
-
-    // var pn = new PubNub({
-        // //Clefs Mick
-        // //publishKey: 'pub-c-4c63bcfd-ef3d-49ff-a17a-5db83c247fe0',
-        // //subscribeKey: 'sub-c-476b1cce-9904-11e6-bb35-0619f8945a4f',
-        // //Clefs Gwendal
-        // //publishKey: 'pub-c-9bb7a63d-5821-4343-ad04-7be9e8a221df',
-        // subscribeKey: 'sub-c-4b267698-97eb-11e6-82f8-02ee2ddab7fe',
-        // ssl: (('https:' == document.location.protocol) ? true : false)
-      // });
-
-    // var defaultLayer = 'mapbox.streets-satellite';
+    	
+	L.mapbox.accessToken = 'pk.eyJ1IjoibWlrayIsImEiOiJjaXVweDc5MXEwMDNzMnlwazk2c2wxMHM0In0.QyydO2WoRTjolCwYV3ZogA';
+	var map = L.mapbox.map('map').setView([49.488332, 0.122278], 13);
 	
-	var map = L.map('map').setView([49.488332, 0.122278], 13);
-	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-		maxZoom: 18,
-		id: 'mapbox.dark',
-		accessToken: 'pk.eyJ1IjoibWlrayIsImEiOiJjaXVweDc5MXEwMDNzMnlwazk2c2wxMHM0In0.QyydO2WoRTjolCwYV3ZogA'
-	}).addTo(map);
-	
-	// var map = L.map('map').setView([49.488332, 0.122278], 13);
- 	
-	// L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-		// attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-	// }).addTo(map);
-	
-    // var map = eon.map({
-        // pubnub: pn,
-        // id: 'map',
-        // mbId: defaultLayer,
-        // mbToken: 'pk.eyJ1IjoibWlrayIsImEiOiJjaXVweDVvaWwwMDBtMnlsOGNsMDU1bWgyIn0.ZrFKwYUj-4oYlTLDXNEtaw',
-        // channels: channels,
-        // connect: function(){
-// //            var lc = L.control.locate().addTo(map);
-// //            lc.start();
-            // map.setView([49.488332, 0.122278], 13);
-        // },
-        // transform: function(data){
-            // var new_data = {};
-            // for (var i = 0; i < data.length; i++) {
-                // var key = 'sensor_' + data[i].sensor;
-                // $.each(data[i].eon, function(index, gaz){
-                    // data[i].eon[index] = (gaz * 100).toFixed(2);
-                // });
-                // new_data[key] = {
-                    // latlng: data[i].latlng,
-                    // data: {id : data[i].sensor, gasArray: data[i].eon}
-                // }
-            // }
-            // return new_data;
-        // },
-        // message: function (data) {
-            // $.each(data, function( index, item ) {
-                // var marker = markerList.find(x => x.options.id === item.data.id)
-                // if(marker){
-
-                    // var markerData = getPopUpText(item.data);
-
-                    // marker.setPopupContent(markerData.popUpText)
-
-                    // marker.options.icon.setColor(markerData.maxGasRate);
-                // }
-            // });
-        // },
-        // marker: function (latlng, data) {
-            // var icon = createIcon(data.id)
-            // var marker = new L.Marker(latlng, {
-                // id: data.id,
-                // icon: icon,
-                // opacity: 0.7,
-            // });
-
-            // var markerData = getPopUpText(data);
-
-            // marker.bindPopup(markerData.popUpText);
-
-            // marker.options.icon.setColor(markerData.maxGasRate);
-
-            // markerList.push(marker);
-
-            // icon.animate();
-
-            // return marker;
-          // }
-      // });
-
-    // map.zoomControl.setPosition('topright');
-
     $('#toolbar .hamburger').on('click', function() {
         $(this).parent().toggleClass('open');
     });
@@ -324,44 +237,41 @@ $( document ).ready(function() {
         e.stopPropagation();
         $(this).children('.content').toggle('slow');
     });
-
-    // L.control.layers({
-        // "streets": L.tileLayer("mapbox.streets"),
-        // "light": L.tileLayer("mapbox.light"),
-        // "dark": L.tileLayer("mapbox.dark"),
-        // "satellite": L.tileLayer("mapbox.satellite"),
-        // "streets-satellite": L.tileLayer("mapbox.streets-satellite"),
-        // "wheatpaste": L.tileLayer("mapbox.wheatpaste"),
-        // "streets-basic": L.tileLayer("mapbox.streets-basic"),
-        // "comic": L.tileLayer("mapbox.comic"),
-        // "outdoors": L.tileLayer("mapbox.outdoors"),
-        // "run-bike-hike": L.tileLayer("mapbox.run-bike-hike"),
-        // "pencil": L.tileLayer("mapbox.pencil"),
-        // "pirates": L.tileLayer("mapbox.pirates"),
-        // "emerald": L.tileLayer("mapbox.emerald"),
-        // "high-contrast": L.tileLayer("mapbox.high-contrast")
-    // }, null).addTo(map);
 	
 	L.control.layers({
-		'Mapbox Streets': L.tileLayer('mapbox.streets'),
-		// 'Mapbox Light': L.mapbox.tileLayer('mapbox.light')
+		'Streets': L.mapbox.tileLayer('mapbox.streets'),
+		'Light': L.mapbox.tileLayer('mapbox.light'),
+		"Dark": L.mapbox.tileLayer("mapbox.dark").addTo(map),
+        "Satellite": L.mapbox.tileLayer("mapbox.satellite"),
+        "Streets-satellite": L.mapbox.tileLayer("mapbox.streets-satellite"),
+        "Wheatpaste": L.mapbox.tileLayer("mapbox.wheatpaste"),
+        "Streets-basic": L.mapbox.tileLayer("mapbox.streets-basic"),
+        "Comic": L.mapbox.tileLayer("mapbox.comic"),
+        "Outdoors": L.mapbox.tileLayer("mapbox.outdoors"),
+        "Run-bike-hike": L.mapbox.tileLayer("mapbox.run-bike-hike"),
+        "Pencil": L.mapbox.tileLayer("mapbox.pencil"),
+        "Pirates": L.mapbox.tileLayer("mapbox.pirates"),
+        "Emerald": L.mapbox.tileLayer("mapbox.emerald"),
+        "High-contrast": L.mapbox.tileLayer("mapbox.high-contrast")
 	}).addTo(map);
 
-
+	
     var icon = createIcon(1)
 	
 	var location = GetLastLocation();
 	
-    var marker = new L.Marker(
-        [location.lat, location.long],
-        {
-            id: 1,
-            icon: icon,
-            opacity: 0.7,
-        }
-    ).addTo(map);
+	var marker = L.marker(
+		[location.lat, location.lng], 
+		{
+			// id=1,
+			icon: icon,
+			opacity: 0.7
+		}
+	);
 
-    var popUpText = "<div class='popup'><div class='item'>"+location.devEUI+"</div><div class='item'>"+location.utcTimestamp+"</div><div class='item'>Lat : "+location.lat+"</div><div class='item'>Long : "+location.long+"</div></div>"
+	marker.addTo(map);
+	
+    var popUpText = "<div class='popup'><div class='item'>"+location.devEUI+"</div><div class='item'>"+location.utcTimestamp+"</div><div class='item'>Lat : "+location.lat+"</div><div class='item'>Long : "+location.lng+"</div></div>"
 
     marker.bindPopup(popUpText).openPopup();
 
@@ -372,10 +282,4 @@ $( document ).ready(function() {
     icon.animate();
 	
 	subscribe();
-		
-	
-
-	// L.marker([location.lat, location.long]).addTo(map)
-	        // .bindPopup('<strong>Science Hall</strong><br>Where the GISC was born.')
-	        // .openPopup();
 });

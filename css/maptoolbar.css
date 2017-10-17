@@ -1,12 +1,3 @@
-#mapwrap {
-  width: 100%;
-  height: 600px;
-  height: 100vh;
-  border: 1px solid #333;
-  position: relative;
-  overflow: hidden;
-}
-
 #toolbar {
   background: rgba(255, 255, 255, 1);
   opacity: .6;
